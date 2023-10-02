@@ -1,0 +1,21 @@
+#Python
+*.pyc
+__pycache__
+
+#datalogs
+*.xls
+*.xlsx
+*.csv
+*.xml
+
+#git created sometimes
+*.orig
+
+#config file
+scripts/config.py
+
+#misc folders
+office work/*
+
+
+

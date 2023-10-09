@@ -1,1 +1,1 @@
-Silicon-level simulation of an x86 processor
+Silicon-level simulation of a microcontroller

@@ -77,15 +77,13 @@ if cfg.plotEn:
 class PLOTTER:
     '''Plotter class'''
 
-    def __init__(self, subFolder=None, livePlotter=False):
-        '''Creates violin plots over a period of time\n
+    def __init__(self, subFolder=None):
+        '''Creates plots\n
         Args:
             subFolder [str, optional]: subfolder to store plots in
-                format: 'myfolder' 
-            livePlotter [bool, optional]: different save format for live gui plotting'''
-        self.pastDataList = []
+                format: 'myfolder' '''
+        self.dataList = []
         self.subFolder = subFolder
-        self.livePlotter = livePlotter
 
     def genericPlot(self, x=None, y=None, multiY=None, multiLabels=None, title=None, xlabel=None, ylabel=None):
         '''Plots data\n
@@ -327,172 +325,15 @@ class PLOTTER:
             plt.close(figStillOpen) 
         else:
             pass
-            
-
-    # def violinPlot(self, pricePointList, orderSpeedList, wtmProf, timestamp=None, dispPlot=False, zoom=None):
-    #     '''Plots a history of order prices over time\n
-    #     Args: 
-    #         pricePointList [list of float] \n
-    #         orderSpeedList [list of float] \n
-    #         wtmProf [float] \n
-    #         timestamp [float, optional] \n
-    #         dispPlot [bool, optional]: 
-    #             True: display plot\n
-    #             False: save plot to file
-    #         zoom [str, optional]: if '96', will zoom in on ~96% price'''
-
-    #     if timestamp is None:
-    #         plotTime = time.time()
-    #     else:
-    #         plotTime = timestamp
-    #     #condition data:
-    #     ROUND_CUTOFF = 10 #one place behind the decimal
-    #     orderSpeedInts = []
-    #     for item in orderSpeedList:
-    #         roundedItem = round(item*10**ROUND_CUTOFF)
-    #         if roundedItem == 0:
-    #             roundedItem = 1
-    #         orderSpeedInts.append(roundedItem)
-
-    #     priceViolinList = []
-    #     columnStrList = []
-    #     newPriceViolinList = []
-    #     newColumnStrList = []
-    #     HistPriceViolinList = []
-    #     HistColumnStrList = []
-    #     for i in range(len(pricePointList)):
-    #         #set j number of violin lists:
-    #         # LENGTH = len(self.pastDataList)
-    #         # for j in range(LENGTH):
-    #         for dictEl in self.pastDataList:
-    #             for k in range(len(dictEl['priceViolinList'])):
-    #                 HistPriceViolinList.append(dictEl['priceViolinList'][k])
-    #                 minSince = (plotTime-dictEl["time"])/60
-    #                 if minSince < 1:
-    #                     secSince = minSince*60
-    #                     if secSince < 25: 
-    #                         timeLabel = f'{round(secSince, 3)} s'
-    #                     else:
-    #                         timeLabel = f'{round(secSince)} s'
-    #                 elif minSince < 25: 
-    #                     timeLabel = f'{round(minSince, 2)} m'
-    #                 elif minSince < 60: 
-    #                     timeLabel = f'{round(minSince)} m'
-    #                 else: #longer than 1 hour
-    #                     hourSince = minSince/60
-    #                     if hourSince < 25:
-    #                         timeLabel = f'{round(minSince/60, 2)} h'
-    #                     else:
-    #                         timeLabel = f'{round(minSince/60)} h'
-    #                 HistColumnStrList.append(timeLabel)
-
-    #         #set variables for newest violin plot
-    #         loopLength = round(math.log(orderSpeedInts[i], 10))
-    #         loopLength = int(loopLength)
-    #         if loopLength == 0:
-    #             loopLength = 1
-    #         for k in range(loopLength):
-    #             newPriceViolinList.append(pricePointList[i])
-    #             newColumnStrList.append(f'Now')
-
-    #     #save converted data to historical record
-    #     self.pastDataList.append({'time': plotTime, 'priceViolinList': newPriceViolinList, 'wtmProf': wtmProf})
-
-    #     #combine new with historical data:
-    #     priceViolinList = HistPriceViolinList + newPriceViolinList
-    #     columnStrList = HistColumnStrList + newColumnStrList
 
 
-    #     #make colored violin plots
-    #     rcParams['figure.figsize'] = 14, 6
-    #     if zoom=='96':
-    #         bw = 0.01
-    #         inner = 'stick'
-    #     else:
-    #         bw=0.07
-    #         inner = 'box'
-    #     # fig = plt.figure(figsize=(14, 6))
-    #     fig2 = sns_violinplot(x=columnStrList, y=priceViolinList, inner=inner, gridsize=500, color='#0485d1',
-    #                 bw=bw, kernel='gau', scale='width') 
-    #                 #x=overLimitViolinList, $"box", "quartile", "point", "stick"
-    #                 #bw=0.2, kernel='gau', cut=0
-    #                 #make scale area, width, or count, area is more skinny so going with that for now
-    #                     #now not using scale since there are so many plots
-    #                 #color: https://xkcd.com/color/rgb/
-    #     plt.title('Order Speeds Over Time vs Profitability Line')
-    #     plt.ylabel('Order Price')
-    #     plt.xticks(rotation=20)
-    #     if zoom == '96':
-    #         # plt.ylim(2.75, 3.0)
-    #         plt.ylim(wtmProf*0.95, wtmProf*0.97) #.94 and .985
-    #     else:
-    #         plt.ylim(YLIM_LOW, YLIM_HIGH) #2.6, 3.8
+class OSCOPE:
+    '''Oscope class'''
 
-    #     #draw profitability lines
-    #     wtmProfList = []
-    #     for dictEl in self.pastDataList:
-    #         wtmProfList.append(dictEl['wtmProf'])
-    #     assert len(self.pastDataList)==len(wtmProfList), 'Error: plot.py found mismatch in list lengths'
-    #     x = range(len(wtmProfList))
-    #     if len(wtmProfList) == 1:
-    #         #make line appear on first plot
-    #         wtmProfList.append(wtmProfList[0])
-    #         x = [-1, 1]
-    #     profLess2 = []
-    #     profLess4 = []
-    #     for value in wtmProfList:
-    #         profLess2.append(value*0.98)
-    #         profLess4.append(value*0.96)
-    #     plt.plot(x, wtmProfList, color='r', linestyle='-', zorder=0)
-    #     plt.plot(x, profLess2, color='r', linestyle='-.', zorder=0)
-    #     plt.plot(x, profLess4, color='r', linestyle='-.', zorder=0)
-
-    #     if dispPlot:
-    #         #plot on screen, blocks main thread
-            
-    #         plt.show()
-    #         # saveDir = ut.pth('', 'rel1')
-    #         if self.subFolder:
-    #             figSaved = plt.savefig(ut.gpth(f"/datalogs/plots/{self.subFolder}/TEST violin_plot.png", 'rel1'))
-    #             # figSaved = plt.savefig(saveDir + f"/datalogs/plots/{self.subFolder}/TEST violin_plot.png")
-    #         else:
-    #             figSaved = plt.savefig(ut.gpth(f"/datalogs/plots/TEST violin_plot.png", 'rel1'))
-    #             # figSaved = plt.savefig(saveDir + f"/datalogs/plots/TEST violin_plot.png")
-    #         # exit()
-    #         # plt.clf() #created a bug
-    #         # plt.close(fig)
-    #         plt.clf()
-    #         plt.close(figSaved)
-    #         figStillOpen = plt.gcf()
-    #         plt.clf()
-    #         plt.close(figStillOpen) 
-    #     else:
-    #         #plot to file, nonblocking
-    #         humReadDate, humReadTime, dateObj = ut.humTimeAndObj()
-    #         # saveDir = ut.pth('', 'rel1')
-    #         if self.livePlotter:
-    #             if zoom==None and self.subFolder==None:
-    #                 # saveDir += f'/datalogs/plots/live/{plotTime}.png'
-    #                 saveDir = ut.gpth(f'/datalogs/plots/live/{plotTime}.png', 'rel1')
-    #             else:
-    #                 # saveDir += f'/datalogs/plots/live/{self.subFolder} {plotTime}.png'
-    #                 saveDir = ut.gpth(f'/datalogs/plots/live/{self.subFolder} {plotTime}.png', 'rel1')
-    #         elif self.subFolder is None:
-    #             # saveDir += f"/datalogs/plots/{humReadDate} {humReadTime.replace(':', '-')} violin_plot.png"
-    #             saveDir = ut.gpth(f"/datalogs/plots/{humReadDate} {humReadTime.replace(':', '-')} violin_plot.png", 'rel1')
-    #         else:
-    #             # saveDir += f"/datalogs/plots/{self.subFolder}/{humReadDate} {humReadTime.replace(':', '-')} violin_plot.png"
-    #             saveDir = ut.gpth(f"/datalogs/plots/{self.subFolder}/{humReadDate} {humReadTime.replace(':', '-')} violin_plot.png", 'rel1')
-    #         figSaved = plt.savefig(saveDir)
-
-    #         plt.clf()
-    #         plt.close()
-
-        
-    #     #fix historical record length
-    #     if zoom == '96':
-    #         dispLength = 5
-    #     else:
-    #         dispLength = 20
-    #     while len(self.pastDataList) > dispLength - 1:
-    #         self.pastDataList.pop(0)
+    def __init__(self):
+        '''Creates oscilloscope plots over a period of time\n
+        Args:
+            subFolder [str, optional]: subfolder to store plots in
+                format: 'myfolder' '''
+        self.dataList = []
+        self.plotter = PLOTTER()

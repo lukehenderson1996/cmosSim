@@ -1,7 +1,7 @@
 '''plot.py: Plots data using seaborn and matplotlib'''
 
 # Author: Luke Henderson
-__version__ = '1.0'
+__version__ = '1.1'
 
 import math
 import time
@@ -38,7 +38,7 @@ PLOT_COLORS = [
     "#0000A9", "#8300FF", "#D900FF", "#FF00BF", "#FF003F", "#FF5800", "#FFB200", "#FFF400", "#F6FF00", "#9FFF00"]
 
 #version with red as second option
-xxPLOT_COLORS = [
+PLOT_COLORS = [
     "g",  # green
     "r",  # red
     "b",  # blue
@@ -326,14 +326,187 @@ class PLOTTER:
         else:
             pass
 
+    def scopePlot(self, t=None, y=None, multiY=None, multiLabels=None, title=None, xlabel=None, ylabel=None, trellis=False):
+        '''Plots voltage/timing data similar to an oscope \n
+        Args:
+            t [np.array]: \n
+            y [np.array]: '''
+        
+        # plots
+        rcParams['figure.figsize'] = 14, 6
+        if trellis:
+            fig2, axs = plt.subplots(len(multiY), 1, sharex=True)
+            fig2.subplots_adjust(hspace=0)
+            for ax, yVals, label in zip(axs, multiY, multiLabels):
+                ax.plot(t, yVals, label=label, linewidth=1.5)
+                ax.grid(True)
+                ax.set_ylabel(label, rotation=0)
+                ax.yaxis.labelpad = len(label)*5
+                formatter = EngFormatter()
+                ax.yaxis.set_major_formatter(formatter)
+            
+            # Set the title and x-label of the entire figure
+            if title:
+                fig2.suptitle(title)
+            axs[-1].xaxis.set_major_formatter(formatter)
+            if xlabel:
+                axs[-1].set_xlabel(xlabel)
+            
+            
+            # plt.show()
+        else:
+            if multiY:
+                assert len(multiY) == len(multiLabels)
+                assert len(PLOT_COLORS) >= len(multiY)
+                for item, label, color in zip(multiY, multiLabels, PLOT_COLORS ):
+                    fig2 = sns_lineplot(x=t, y=item, label=label, color=color, zorder=5, linewidth=1.5)
+            else:
+                fig2 = sns_lineplot(x=t, y=y, zorder=5, linewidth=1.5) #x='Vgs', y='Ron' 
+
+            fig2.grid('True')
+            # plt.gca().xaxis.grid(True, which='major', linewidth=0.8, color='#656565')
+            # plt.gca().yaxis.grid(True, which='major', linewidth=0.8, color='#656565')
+            # plt.gca().yaxis.grid(True, which='minor', linestyle='--', linewidth=0.5)
+            #optional labeling
+            if title:
+                plt.title(title)
+            if xlabel:
+                plt.xlabel(xlabel)
+            if ylabel:
+                plt.ylabel(ylabel)
+            #custom xticks
+            # plt.xticks(rotation=20)
+            # plt.xticks([-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6])
+            #formatting
+            formatter = EngFormatter()
+            plt.gca().xaxis.set_major_formatter(formatter)
+            if multiY:
+                plt.legend() #ncol=5
+
+        # #optional lines
+        # assert not multiY
+        # line1 = []
+        # line2 = []
+        # for item in x:
+        #     line1.append(4)
+        #     line2.append(8)
+        # plt.plot(x, line2, color='r', linestyle='-', zorder=4, label='8 Ω')
+        # plt.plot(x, line1, color='r', linestyle='-.', zorder=4, label='4 Ω')
+        # plt.legend()
+
+        #plot on screen, blocks main thread
+        plt.show()
+        figStillOpen = plt.gcf()
+        plt.clf()
+        plt.close(figStillOpen)
+
+    def scopeTrellisPlot(self, t=None, y=None, multiY=None, multiLabels=None, title=None, xlabel=None, ylabel=None):
+        """Generates a trellis plot using numpy and matplotlib.
+        Args:
+        - t [np.array]: Time values
+        - multiY [list of np.array]: List of y-values
+        - multiLabels [list of str]: Names for the y-values
+        - title [str]: Plot title
+        """
+        num_plots = len(multiY)
+        
+        # Create subplots
+        fig, axs = plt.subplots(num_plots, 1, sharex=True, figsize=(14, 6 * num_plots))
+        
+        # Ensure axs is a list even if there's only one subplot
+        if num_plots == 1:
+            axs = [axs]
+        
+        fig.subplots_adjust(hspace=0)
+        
+        # Plot each dataset
+        for ax, y_vals, label in zip(axs, multiY, multiLabels):
+            ax.plot(t, y_vals, label=label, linewidth=1.5, color='r')
+            # ax.legend()
+            ax.grid(True)
+            ax.set_ylabel(label)
+            formatter = EngFormatter()
+            ax.xaxis.set_major_formatter(formatter)
+        
+        # Set the title and x-label of the entire figure
+        if title:
+            fig.suptitle(title)
+        axs[-1].set_xlabel('Time')
+        
+        plt.show()
+
 
 class OSCOPE:
     '''Oscope class'''
 
     def __init__(self):
         '''Creates oscilloscope plots over a period of time\n
-        Args:
-            subFolder [str, optional]: subfolder to store plots in
-                format: 'myfolder' '''
+        Notes:
+            dataList [list of dict]: input data (small number of samples where information is changing)
+                dict format: {'v': voltage list, t: timing list, 'intp': interpolation bool}
+                    whether to use linear interpolation (True) \n
+                    or to merely extend the values (False)
+            tSamples [numpy array]: time samples (large number of linspace values)
+            vSamplesList [list of numpy array]: voltage samples (large number)'''
         self.dataList = []
+        self.tSamples = None
+        self.vSamplesList = []
         self.plotter = PLOTTER()
+    
+    def plot(self, multiLabels=None, title=None, xlabel=None, ylabel=None, trellis=False):
+        NUM_SAMPLES = 10_000
+        if isinstance(self.dataList, list):
+            for item in self.dataList:
+                if isinstance(item, dict):
+                    pass
+                else:
+                    cl.red('Error: dataList must contain "dict" objects only')
+                    dt.info(self.dataList, 'self.dataList')
+                    exit()
+        else:
+            cl.red('Error: dataList must be of type "list"')
+            dt.info(self.dataList, 'self.dataList')
+            exit()
+
+        #produce tSamples and vSamples list
+        for dataDict in self.dataList:
+            t = dataDict['t']
+            v = dataDict['v']
+            intp = dataDict['intp']
+            if not self.tSamples is None:
+                if t[-1] > self.tSamples[-1]:
+                    self.tSamples = np.append(self.tSamples, t[-1])
+                assert t[-1] <= self.tSamples[-1]
+            else:
+                self.tSamples = np.linspace(t[0], (t[-1]-t[0])*1.10, NUM_SAMPLES)
+            if intp:
+                vSamples = np.interp(self.tSamples, t, v)
+            else:
+                vSamples = np.zeros_like(self.tSamples)
+                tPositions = [np.argmax(self.tSamples >= timeVal) for timeVal in t]
+                tPositions.append(len(self.tSamples)) #will be an invalid index, but expecting later code to be [:endInd]
+                assert len(t)==len(v) and len(t)+1==len(tPositions)
+                #populate voltages
+                for i in range(len(tPositions)-1):
+                    startInd = tPositions[i]
+                    endInd   = tPositions[i+1]
+                    vSamples[startInd:endInd] = v[i]
+            self.vSamplesList.append(vSamples)
+        # dt.info(self.vSamplesList, 'self.vSamplesList')
+
+        
+
+        if len(self.vSamplesList) == 1:
+            self.plotter.scopePlot(t=self.tSamples, y=self.vSamplesList[0], title='Oscope', xlabel='Time (s)')
+        else:
+            for i in range(len(self.vSamplesList)):
+                while len(self.vSamplesList[i]) < len(self.tSamples):
+                    self.vSamplesList[i] = np.append(self.vSamplesList[i], self.vSamplesList[i][-1])
+            self.plotter.scopePlot(t=self.tSamples, multiY=self.vSamplesList, multiLabels=multiLabels, 
+                                   title=title, xlabel=xlabel, ylabel=ylabel, trellis=trellis)
+        # dt.info(tSamples, 'tPoints')
+        # dt.info(tPositions, 'tPositions')
+        # for i in range(len(vSamples)):
+        #     print(vSamples[i])
+        
+        

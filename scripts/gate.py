@@ -1,7 +1,7 @@
 '''gate.py generates logic gates'''
 
 # Author: Luke Henderson
-__version__ = '1.0'
+__version__ = '1.1'
 
 import math
 
@@ -80,6 +80,9 @@ class INV:
         self.voutFinal = self.vout + deltaV #actual final output voltage
         self.stepChg = self.cld * deltaV
         self.stepEnergy = (1/2)*self.cld*(deltaV**2)
+        if self.stepChg < 0:
+            self.stepChg = self.ssCurr * self.stepTime
+            self.stepEnergy = self.ssPwr * self.stepTime
         # print(f'pRds is {pRds}')
         # print(f'nRds is {nRds}')
         # print(f'sumRds is {sumRds}')
@@ -89,6 +92,7 @@ class INV:
         # print(f'self.stepEnergy is {self.stepEnergy}')
         
         #prepare for next step
+        self.initVout = self.vout
         self.vout = self.voutFinal
         
 class NAND:
@@ -175,6 +179,9 @@ class NAND:
         self.voutFinal = self.vout + deltaV #actual final output voltage
         self.stepChg = self.cld * deltaV
         self.stepEnergy = (1/2)*self.cld*(deltaV**2)
+        if self.stepChg < 0:
+            self.stepChg = self.ssCurr * self.stepTime
+            self.stepEnergy = self.ssPwr * self.stepTime
         # print(f'pRds is {pRds}')
         # print(f'nRds is {nRds}')
         # print(f'sumRds is {sumRds}')
@@ -184,6 +191,7 @@ class NAND:
         # print(f'self.stepEnergy is {self.stepEnergy}')
 
         #prepare for next step
+        self.initVout = self.vout
         self.vout = self.voutFinal
 
 class NOR:
@@ -270,6 +278,9 @@ class NOR:
         self.voutFinal = self.vout + deltaV #actual final output voltage
         self.stepChg = self.cld * deltaV
         self.stepEnergy = (1/2)*self.cld*(deltaV**2)
+        if self.stepChg < 0:
+            self.stepChg = self.ssCurr * self.stepTime
+            self.stepEnergy = self.ssPwr * self.stepTime
         # print(f'pRds is {pRds}')
         # print(f'nRds is {nRds}')
         # print(f'sumRds is {sumRds}')
@@ -279,6 +290,7 @@ class NOR:
         # print(f'self.stepEnergy is {self.stepEnergy}')
 
         #prepare for next step
+        self.initVout = self.vout
         self.vout = self.voutFinal
 
 class XOR:
@@ -417,8 +429,15 @@ class XOR:
         deltaVpercentage = 1-math.exp(-TAUS_PER_OPERATION)
         deltaV = (self.ssVfinal-self.vout) * deltaVpercentage 
         self.voutFinal = self.vout + deltaV #actual final output voltage
-        self.stepChg = self.cld * deltaV + self.invA.stepChg + self.invB.stepChg
-        self.stepEnergy = (1/2)*self.cld*(deltaV**2) + self.invA.stepEnergy + self.invB.stepEnergy
+        # self.stepChg = self.cld * deltaV + self.invA.stepChg + self.invB.stepChg
+        # self.stepEnergy = (1/2)*self.cld*(deltaV**2) + self.invA.stepEnergy + self.invB.stepEnergy
+        self.stepChg = self.cld * deltaV
+        self.stepEnergy = (1/2)*self.cld*(deltaV**2)
+        if self.stepChg < 0:
+            self.stepChg = self.ssCurr * self.stepTime
+            self.stepEnergy = self.ssPwr * self.stepTime
+        self.stepChg += self.invA.stepChg + self.invB.stepChg
+        self.stepEnergy += self.invA.stepEnergy + self.invB.stepEnergy
         # print(f'pRds is {pRds}')
         # print(f'nRds is {nRds}')
         # print(f'sumRds is {sumRds}')
@@ -428,6 +447,7 @@ class XOR:
         # print(f'self.stepEnergy is {self.stepEnergy}')
 
         #prepare for next step
+        self.initVout = self.vout
         self.vout = self.voutFinal
 
 if __name__ == '__main__':

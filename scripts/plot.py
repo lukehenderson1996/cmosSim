@@ -1,7 +1,7 @@
 '''plot.py: Plots data using seaborn and matplotlib'''
 
 # Author: Luke Henderson
-__version__ = '1.1'
+__version__ = '1.2'
 
 import math
 import time
@@ -146,7 +146,7 @@ class PLOTTER:
         plt.clf()
         plt.close(figStillOpen)
 
-    def binPlot(self, x=None, kde=False, multiX=None, multiLabels=None, title=None, xlabel=None, ylabel=None):
+    def binPlot(self, x=None, kde=False, multiX=None, multiLabels=None, title=None, xlabel=None, ylabel=None, xLogPlot=False):
         '''Plots statistically binned data\n
         Args:
             x [np.array]: \n
@@ -170,7 +170,7 @@ class PLOTTER:
             #original
             # fig2 = sns_histplot(x=x, kde=kde) 
             #new format
-            fig2 = sns_histplot(x=x, kde=False, stat="count", element="step", fill=False)
+            fig2 = sns_histplot(x=x, kde=False) #stat="count", element="step", fill=False
 
             #extra attempts
             # fig2 = sns_histplot(x=x, stat='density', fill=False, kde=kde) #element='line',
@@ -192,6 +192,8 @@ class PLOTTER:
         # plt.xticks([-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6])
         formatter = EngFormatter()
         plt.gca().yaxis.set_major_formatter(formatter)
+        if xLogPlot:
+            plt.gca().xaxis.set_major_formatter(formatter)
         if multiX:
             plt.legend() #ncol=5
 

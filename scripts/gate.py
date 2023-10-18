@@ -299,7 +299,7 @@ class XOR:
     def __init__(self, vdd, vinA=0, vinB=0, vout=0, procVarArr=None):
         '''XOR gate \n
         Args:
-            procVarArr [List of procVar dicts, N=8]: given in order 
+            procVarArr [List of procVar dicts, n=12]: given in order 
                 [nmos abAB, pmos abAB, invA-np, invB-np]
                     (for abAB the capitals are compliment)
             vdd [float]: Vdd upon initialization\n

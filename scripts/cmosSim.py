@@ -24,7 +24,7 @@ cl.green('Program Start')
 
 #----------------------------------------------------------------init----------------------------------------------------------------
 #assert correct module versions 
-modV = {cfg:  '0.1',
+modV = {cfg:  '1.0',
         cl:   '0.8',
         lg:   '1.3',
         plot: '1.2',
@@ -427,6 +427,11 @@ for module in modV:
 #         vdd += 0.002
 #         res, tb = valFullAdder(vdd=vdd, freq=4e9, quiet=True, wc=wc)
 #         if res:
+#             # #reset and run again with some margin 
+#             # wc.waferIter[i]=0 
+#             # vdd += 0.01
+#             # res, tb = valFullAdder(vdd=vdd, freq=4e9, quiet=True, wc=wc)
+#             #save results
 #             vddMinList.append(vdd)
 #             powerList.append(tb.avgPwr*1e3)
 #             propTimeList.append(max(tb.propTimeList))
@@ -441,11 +446,11 @@ for module in modV:
 # # dt.info(powerList, 'powerList')
 # # dt.info(propTimeList, 'propTimeList')
 # print('Saving pickle files...')
-# with open('pickle\\Vdd min tests 10k - vddMinList.pkl', 'wb') as f:
+# with open('pickle\\FILE NAME HERE - Vdd min tests 10k - vddMinList.pkl', 'wb') as f:
 #     pickle.dump(vddMinList, f)
-# with open('pickle\\Vdd min tests 10k - powerList.pkl', 'wb') as f:
+# with open('pickle\\FILE NAME HERE - Vdd min tests 10k - powerList.pkl', 'wb') as f:
 #     pickle.dump(powerList, f)
-# with open('pickle\\Vdd min tests 10k - propTimeList.pkl', 'wb') as f:
+# with open('pickle\\FILE NAME HERE - Vdd min tests 10k - propTimeList.pkl', 'wb') as f:
 #     pickle.dump(propTimeList, f)
 
 # print('Plotting...')
@@ -476,11 +481,11 @@ for module in modV:
 
 
 ######################################Yield Analysis#####################################
-with open('pickle\\Vdd min tests 10k - vddMinList.pkl', 'rb') as f:
+with open('pickle\\Vdd min + 0.01 tests 10k - vddMinList.pkl', 'rb') as f:
     vddMinList = pickle.load(f)
-with open('pickle\\Vdd min tests 10k - powerList.pkl', 'rb') as f:
+with open('pickle\\Vdd min + 0.01 tests 10k - powerList.pkl', 'rb') as f:
     powerList = pickle.load(f)
-with open('pickle\\Vdd min tests 10k - propTimeList.pkl', 'rb') as f:
+with open('pickle\\Vdd min + 0.01 tests 10k - propTimeList.pkl', 'rb') as f:
     propTimeList = pickle.load(f)
 
 popIdxs = []
